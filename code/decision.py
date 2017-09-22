@@ -1,4 +1,5 @@
 import numpy as np
+import perception
 
 
 # This is where you can build a decision tree for determining throttle, brake and steer
@@ -24,34 +25,6 @@ def decision_step(Rover):
                 else: # Else coast
                     Rover.throttle = 0
                 Rover.brake = 0
-                ##############################################################################################
-                # Determining where to go:
-                # 1) Find the steering angle pointing the direction of the most navigable terrain.
-                angle = np.mean(Rover.nav_angles * 180 / np.pi)
-                # 2) For angles +/- 45 degrees from the angle defined above, find the steering angle the will
-                # lead the robot to point in the world that has been least visited according to the sum of the
-                # visit counts in Rover.worldmap_visited.
-                visit_count = []
-                for delta in np.arange(-45, 45, step=5):
-                    # Given a candidate direction, project where the robot will be if that angle is selected.
-                    new_x = 70 * np.cos((angle+delta)*np.pi/180.)
-                    new_y = 70 * np.cos((angle+delta)*np.pi/180.)
-                    new_x, new_y = perception.pix_to_world(
-                        new_x, new_y, Rover.pos[0], Rover.pos[1], Rover.yaw,
-                        Rover.worldmap.shape[0], 10)
-                    # If the new direction lands the robot in an obstacle then we skip it, otherwise we
-                    # count the number of times that area has been visited.
-                    if not np.all(Rover.worldmap[new_y, new_x] == [255, 0, 0]):
-                        count = np.sum(Rover.worldmap_visited[new_y-5:new_y+5, new_x-5:new_x+5].ravel())
-                        visit_count.append((delta, count))
-                # 3) If we have found more than one possible direction, then we select the one with the least visit.
-                if len(visit_count) > 0:
-                    best_delta = sorted(visit_count, key=lambda record: record[1])[0][0]
-                    Rover.steer = angle + best_delta
-                else:
-                # 4) Otherwise simply steer the robot in the direction of the most navigable terrain.
-                    Rover.steer = np.clip(angle, -15, 15)
-                #################################################################################################
                 # Set steering to average angle clipped to the range +/- 15
                 Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
             # If there's a lack of navigable terrain pixels then go to 'stop' mode
