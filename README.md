@@ -31,13 +31,10 @@ def color_thresh(img, rgb_thresh=(160, 160, 160)):
     color_select[above_thresh] = 1
     # Return the binary image
     return color_select
-
-threshed = color_thresh(warped)
-plt.imshow(threshed, cmap='gray')
 ````
 In order to create a worldmap the code in cell 11 of the Jupyter notebook was used. The first function `rover_coords` converts the coordinates of the image into coordinates relvative to the position of the rover. The function `to_polar_coords` converts these x and y coordinates of the rover in the world plane into polar coordinates. The `rotate_pix` function rotates the picture according to the yaw of the rover in world space, while `translate_pix` scales and translates them. These two functions comabine in the `pix_to_world` function to turn the camera image from the rover into an image on the world map.
 
-```python
+````python
 # Define a function to convert from image coords to rover coords
 def rover_coords(binary_img):
     # Identify nonzero pixels
@@ -88,10 +85,10 @@ def pix_to_world(xpix, ypix, xpos, ypos, yaw, world_size, scale):
     y_pix_world = np.clip(np.int_(ypix_tran), 0, world_size - 1)
     # Return the result
     return x_pix_world, y_pix_world
-```
+````
 The decision step function for the Rover is designed to steer the rover in the direction of the most navigable terrain. If there is no navigable terrain the Rover will stop and turn. The steering angle is clipped between +/- 15 degrees.
 
-```python
+````python
 
 def decision_step(Rover):
 
@@ -163,11 +160,11 @@ def decision_step(Rover):
 
     return Rover
 
-    ```
+````
 
     The perception step function from perception.py uses many of the same functions from the Jupyter notebook to map the navigable terrain and find rocks. Looking for the rocks just utilises a separate colour thresholding function looking in the red and green channels.
 
-    ```python
+````python
 
     def perception_step(Rover):
         # Perform perception steps to update Rover()
@@ -262,5 +259,4 @@ def decision_step(Rover):
             Rover.vision_image[:, :, 1] = 0
 
         return Rover
-
-        ```
+````
